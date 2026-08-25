@@ -38,13 +38,13 @@ jobs:
 
       - name: Build and push backend
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/employee-backend:${{ steps.tag.outputs.backend_tag }} backend/
-          docker push ${{ secrets.ECR_REGISTRY }}/employee-backend:${{ steps.tag.outputs.backend_tag }}
+          docker build -t ${{ vars.ECR_REGISTRY }}/employee-backend:${{ steps.tag.outputs.backend_tag }} backend/
+          docker push ${{ vars.ECR_REGISTRY }}/employee-backend:${{ steps.tag.outputs.backend_tag }}
 
       - name: Build and push frontend
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/employee-frontend:${{ steps.tag.outputs.frontend_tag }} frontend/
-          docker push ${{ secrets.ECR_REGISTRY }}/employee-frontend:${{ steps.tag.outputs.frontend_tag }}
+          docker build -t ${{ vars.ECR_REGISTRY }}/employee-frontend:${{ steps.tag.outputs.frontend_tag }} frontend/
+          docker push ${{ vars.ECR_REGISTRY }}/employee-frontend:${{ steps.tag.outputs.frontend_tag }}
 
       - name: Update image tags in values.yaml
         run: |
@@ -73,7 +73,7 @@ jobs:
           script: |
             # Authenticate with ECR
             aws ecr get-login-password --region ${{ vars.AWS_REGION }} | \
-              docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+              docker login --username AWS --password-stdin ${{ vars.ECR_REGISTRY }}
 
             # Create network if it does not exist
             docker network inspect employee-network >/dev/null 2>&1 || \
@@ -94,8 +94,8 @@ jobs:
             fi
 
             # Pull latest images
-            docker pull ${{ secrets.ECR_REGISTRY }}/employee-backend:${{ needs.build-and-push.outputs.backend_tag }}
-            docker pull ${{ secrets.ECR_REGISTRY }}/employee-frontend:${{ needs.build-and-push.outputs.frontend_tag }}
+            docker pull ${{ vars.ECR_REGISTRY }}/employee-backend:${{ needs.build-and-push.outputs.backend_tag }}
+            docker pull ${{ vars.ECR_REGISTRY }}/employee-frontend:${{ needs.build-and-push.outputs.frontend_tag }}
 
             # Replace old containers
             docker rm -f backend frontend || true
@@ -104,16 +104,16 @@ jobs:
               --network employee-network \
               -p 5000:5000 \
               -e DATABASE_URL=postgresql://postgres:postgres@db:5432/employees \
-              ${{ secrets.ECR_REGISTRY }}/employee-backend:${{ needs.build-and-push.outputs.backend_tag }}
+              ${{ vars.ECR_REGISTRY }}/employee-backend:${{ needs.build-and-push.outputs.backend_tag }}
 
             docker run -d --name frontend --restart unless-stopped \
               --network employee-network \
               -p 8080:80 \
-              ${{ secrets.ECR_REGISTRY }}/employee-frontend:${{ needs.build-and-push.outputs.frontend_tag }}
+              ${{ vars.ECR_REGISTRY }}/employee-frontend:${{ needs.build-and-push.outputs.frontend_tag }}
 
             # Remove dangling and old images to free disk space
             docker image prune -f
-            docker images ${{ secrets.ECR_REGISTRY }}/employee-backend --format '{{.ID}} {{.Tag}}' | \
+            docker images ${{ vars.ECR_REGISTRY }}/employee-backend --format '{{.ID}} {{.Tag}}' | \
               grep -v '${{ needs.build-and-push.outputs.backend_tag }}' | awk '{print $1}' | xargs -r docker rmi -f || true
-            docker images ${{ secrets.ECR_REGISTRY }}/employee-frontend --format '{{.ID}} {{.Tag}}' | \
+            docker images ${{ vars.ECR_REGISTRY }}/employee-frontend --format '{{.ID}} {{.Tag}}' | \
               grep -v '${{ needs.build-and-push.outputs.frontend_tag }}' | awk '{print $1}' | xargs -r docker rmi -f || true
