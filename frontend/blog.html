@@ -18,6 +18,17 @@
         .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; gap: 8px; padding: 0 40px; border-top: 1px solid rgba(255,255,255,0.1); }
         .navbar a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; padding: 14px 20px; transition: all 0.2s; border-bottom: 2px solid transparent; }
         .navbar a:hover, .navbar a.active { color: #fff; border-bottom-color: #a78bfa; }
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 4px; }
+        .nav-dropdown-toggle .caret { transition: transform 0.2s; }
+        .nav-dropdown:hover .nav-dropdown-toggle .caret { transform: rotate(180deg); }
+        .nav-dropdown-menu { position: absolute; top: 100%; left: 50%; display: flex; gap: 32px; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 20px 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); opacity: 0; visibility: hidden; transform: translate(-50%, 8px); transition: all 0.2s; z-index: 100; min-width: 420px; }
+        .nav-dropdown:hover .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+        .nav-dropdown-col { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+        .nav-dropdown-heading { color: #a78bfa; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+        .nav-dropdown-menu a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 13px; font-weight: 500; padding: 4px 0; white-space: nowrap; border-bottom: none; }
+        .nav-dropdown-menu a:hover { color: #fff; }
+        @media (max-width: 640px) { .nav-dropdown-menu { min-width: 260px; flex-direction: column; gap: 16px; left: 0; transform: translateY(8px); } .nav-dropdown:hover .nav-dropdown-menu { transform: translateY(0); } }
 
         .page-content { flex: 1; max-width: 1100px; margin: 60px auto; padding: 0 30px; width: 100%; }
 
@@ -84,7 +95,32 @@
     <nav class="navbar">
         <a href="index.html">Home</a>
         <a href="about.html">About</a>
-        <a href="services.html">Services</a>
+        <div class="nav-dropdown">
+            <a href="services.html" class="nav-dropdown-toggle">Services <svg class="caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></a>
+            <div class="nav-dropdown-menu">
+                <div class="nav-dropdown-col">
+                    <span class="nav-dropdown-heading">Services</span>
+                    <a href="services.html#services">Cloud Architecture</a>
+                    <a href="services.html#services">DevOps Consulting</a>
+                    <a href="services.html#services">CI/CD Implementation</a>
+                    <a href="services.html#services">Kubernetes Migration</a>
+                    <a href="services.html#services">Infrastructure as Code</a>
+                    <a href="services.html#services">Security &amp; Compliance</a>
+                </div>
+                <div class="nav-dropdown-col">
+                    <span class="nav-dropdown-heading">Program Modules</span>
+                    <a href="services.html#modules">Linux &amp; Networking</a>
+                    <a href="services.html#modules">Git &amp; Source Control</a>
+                    <a href="services.html#modules">Build &amp; Packaging</a>
+                    <a href="services.html#modules">Docker &amp; Containers</a>
+                    <a href="services.html#modules">Kubernetes &amp; EKS</a>
+                    <a href="services.html#modules">Helm &amp; GitOps</a>
+                    <a href="services.html#modules">CI/CD Pipelines</a>
+                    <a href="services.html#modules">Terraform &amp; IaC</a>
+                    <a href="services.html#modules">Monitoring &amp; Observability</a>
+                </div>
+            </div>
+        </div>
         <a href="contact.html">Contact</a>
         <a href="blog.html" class="active">Blog</a>
     </nav>
