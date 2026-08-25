@@ -91,9 +91,11 @@ jobs:
           command: |
             echo "export BACKEND_TAG=$(cat /tmp/backend_tag)" >> $BASH_ENV
             echo "export FRONTEND_TAG=$(cat /tmp/frontend_tag)" >> $BASH_ENV
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:hrAl3JTCDs3NuMLLkmWbkHuAeCIjPI0zts13USKB1jo"
+      - run:
+          name: Write deploy SSH key
+          command: |
+            echo "$EC2_SSH_KEY" > /tmp/id_rsa
+            chmod 600 /tmp/id_rsa
       - run:
           name: Deploy to EC2
           command: |
@@ -112,8 +114,8 @@ jobs:
             docker run -d --name frontend --restart unless-stopped --network employee-network -p 8080:80 ${ECR_REGISTRY}/employee-frontend:${FRONTEND_TAG}
             docker image prune -f
             SCRIPT
-            scp -o StrictHostKeyChecking=no /tmp/deploy.sh $EC2_USER@$EC2_HOST:/tmp/deploy.sh
-            ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "bash /tmp/deploy.sh"
+            scp -o StrictHostKeyChecking=no -i /tmp/id_rsa /tmp/deploy.sh $EC2_USER@$EC2_HOST:/tmp/deploy.sh
+            ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa $EC2_USER@$EC2_HOST "bash /tmp/deploy.sh"
 
 # ── Workflows ──────────────────────────────────────────────────────────────────
 workflows:
