@@ -14,7 +14,7 @@ pipeline {
                 sh '''
                     pip install -r backend/requirements.txt
                     cd backend
-                    DATABASE_URL=sqlite:///test.db pytest -v
+                    DATABASE_URL=sqlite:///test.db python3 -m pytest -v
                 '''
             }
         }
