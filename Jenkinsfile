@@ -20,6 +20,7 @@ pipeline {
         }
 
         stage('Build & Push') {
+            when { branch 'main' }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-credentials',
@@ -44,6 +45,7 @@ pipeline {
         }
 
         stage('Deploy') {
+            when { branch 'main' }
             steps {
                 withCredentials([
                     sshUserPrivateKey(
